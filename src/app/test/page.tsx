@@ -1,6 +1,4 @@
-"use client";
-
-import React, { useEffect, useState } from "react";
+export const runtime = "nodejs";
 
 type User = {
   id: string;
@@ -13,27 +11,17 @@ type User = {
   address: string;
 };
 
-const UserDirectory = () => {
-  const [users, setUsers] = useState<User[]>([]);
-  const [loading, setLoading] = useState(true);
+async function getUsers(): Promise<User[]> {
+  const res = await fetch("https://6864e42c5b5d8d03397eb631.mockapi.io/api/user");
+  return res.json();
+}
 
-  useEffect(() => {
-    fetch("https://6864e42c5b5d8d03397eb631.mockapi.io/api/user")
-      .then((res) => res.json())
-      .then((data) => {
-        setUsers(data);
-        setLoading(false);
-      });
-  }, []);
-
-  if (loading) {
-    return <p className="text-center mt-10 text-lg">Loading users...</p>;
-  }
+export default async function UserDirectory() {
+  const users = await getUsers();
 
   return (
     <div className="min-h-screen bg-gray-100 px-6 py-10">
       <h1 className="text-3xl font-bold mb-8 text-center">User Directory</h1>
-
       <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6 justify-items-center">
         {users.map((user) => (
           <div
@@ -57,6 +45,4 @@ const UserDirectory = () => {
       </div>
     </div>
   );
-};
-
-export default UserDirectory;
+}

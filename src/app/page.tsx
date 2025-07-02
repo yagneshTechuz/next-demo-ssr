@@ -5,6 +5,7 @@ import Header from "@/components/homepage/Header";
 import Reviews from "@/components/homepage/Reviews";
 import { Product } from "@/types/product.types";
 import { Review } from "@/types/review.types";
+export const runtime = 'nodejs';
 
 export const newArrivalsData: Product[] = [
   {

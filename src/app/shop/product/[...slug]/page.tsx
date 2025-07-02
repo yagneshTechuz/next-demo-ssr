@@ -9,6 +9,7 @@ import Header from "@/components/product-page/Header";
 import Tabs from "@/components/product-page/Tabs";
 import { Product } from "@/types/product.types";
 import { notFound } from "next/navigation";
+export const runtime = 'nodejs';
 
 const data: Product[] = [
   ...newArrivalsData,

@@ -5,6 +5,7 @@ import { Provider } from "react-redux";
 import { makeStore } from "../lib/store";
 import { PersistGate } from "redux-persist/integration/react";
 import SpinnerbLoader from "@/components/ui/SpinnerbLoader";
+export const runtime = 'nodejs';
 
 type Props = {
   children: React.ReactNode;

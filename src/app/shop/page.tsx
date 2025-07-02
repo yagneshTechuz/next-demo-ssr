@@ -1,5 +1,5 @@
 import BreadcrumbShop from "@/components/shop-page/BreadcrumbShop";
-
+export const runtime = 'nodejs';
 import {
   Select,
   SelectContent,
