@@ -22,22 +22,42 @@ type ReviewsProps = { data: Review[] };
 const Reviews = ({ data }: ReviewsProps) => {
   const [api, setApi] = React.useState<CarouselApi>();
   const [current, setCurrent] = React.useState(0);
-  const [count, setCount] = React.useState(0);
   const isDesktop = useMediaQuery("(min-width: 1024px)");
   const isClient = useIsClient();
+
+  const totalSlides = React.useMemo(
+    () => api?.scrollSnapList().length ?? data.length,
+    [api, data.length]
+  );
 
   React.useEffect(() => {
     if (!api) {
       return;
     }
 
-    setCount(api.scrollSnapList().length);
-    setCurrent(api.selectedScrollSnap() + 1);
+    const handleSelect = () => setCurrent(api.selectedScrollSnap());
 
-    api.on("select", () => {
-      setCurrent(api.selectedScrollSnap() + 1);
-    });
+    handleSelect();
+    api.on("select", handleSelect);
+
+    return () => {
+      api.off("select", handleSelect);
+    };
   }, [api]);
+
+  const blurredIndices = React.useMemo(() => {
+    if (data.length < 6 || !totalSlides) return new Set<number>();
+
+    const wrapIndex = (index: number) => (index + totalSlides) % totalSlides;
+    const offset = isDesktop ? 2 : 1;
+
+    return new Set<number>([
+      wrapIndex(current + offset),
+      wrapIndex(current - offset),
+    ]);
+  }, [current, data.length, isDesktop, totalSlides]);
+
+  const shouldBlur = data.length >= 6;
 
   if (!isClient) return null;
 
@@ -89,31 +109,10 @@ const Reviews = ({ data }: ReviewsProps) => {
                   className="h-full"
                   data={review}
                   blurChild={
-                    data.length >= 6 && (
+                    shouldBlur && (
                       <div
                         className={cn([
-                          isDesktop
-                            ? (current + 1 === count
-                                ? 0
-                                : current + 1 > count
-                                ? 1
-                                : current + 1) === index &&
-                              "backdrop-blur-[2px]"
-                            : (current === count ? 0 : current) === index &&
-                              "backdrop-blur-[2px]",
-                          isDesktop
-                            ? (current === 1
-                                ? count - 2
-                                : current === 2
-                                ? count - 1
-                                : current - 3) === index &&
-                              "backdrop-blur-[2px]"
-                            : (current === 1
-                                ? count - 1
-                                : current === 2
-                                ? 0
-                                : current - 2) === index &&
-                              "backdrop-blur-[2px]",
+                          blurredIndices.has(index) && "backdrop-blur-[2px]",
                           "absolute bg-white/10 right-0 top-0 h-full w-full z-10",
                         ])}
                       />
